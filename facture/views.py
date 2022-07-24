@@ -4,50 +4,91 @@ from .models import AssFactureObr
 
 # ---------------------------------------
 class Facture:
-    def __init__(self):
-        self.invoice_number = ""
-        self.invoice_date = ""
-        self.invoice_type = ""
-        self.tp_type = ""
-        self.tp_name = ""
-        self.tp_TIN = ""
-        self.tp_trade_number = ""
-        self.tp_postal_number = ""
-        self.tp_phone_number = ""
-        self.tp_address_province = ""
-        self.tp_address_commune = ""
-        self.tp_address_quartier = ""
-        self.tp_address_avenue = ""
-        self.tp_address_number = ""
-        self.vat_taxpayer = ""
-        self.ct_taxpayer = ""
-        self.tl_taxpayer = ""
-        self.tp_fiscal_center = ""
-        self.tp_activity_sector = ""
-        self.tp_legal_form = ""
-        self.payment_type = ""
-        self.invoice_currency  = ""
-        self.customer_name = ""
-        self.customer_TIN = ""
-        self.customer_address = ""
-        self.vat_customer_payer = ""
-        self.cancelled_invoice_ref = ""
-        self.invoice_ref = ""
-        self.invoice_signature = ""
-        self.invoice_signature_date = ""
+    def __init__(self, 
+        invoice_number,
+        invoice_date,
+        invoice_type,
+        tp_type,
+        tp_name,
+        tp_TIN,
+        tp_trade_number,
+        tp_postal_number,
+        tp_phone_number,
+        tp_address_province,
+        tp_address_commune,
+        tp_address_quartier,
+        tp_address_avenue,
+        tp_address_number,
+        vat_taxpayer,
+        ct_taxpayer,
+        tl_taxpayer,
+        tp_fiscal_center,
+        tp_activity_sector,
+        tp_legal_form,
+        payment_type,
+        invoice_currency ,
+        customer_name,
+        customer_TIN,
+        customer_address,
+        vat_customer_payer,
+        cancelled_invoice_ref,
+        invoice_ref,
+        invoice_signature,
+        invoice_signature_date):
+
+        self.invoice_number = invoice_number
+        self.invoice_date = invoice_date
+        self.invoice_type = invoice_type
+        self.tp_type = tp_type
+        self.tp_name = tp_name
+        self.tp_TIN = tp_TIN
+        self.tp_trade_number = tp_trade_number
+        self.tp_postal_number = tp_postal_number
+        self.tp_phone_number = tp_phone_number
+        self.tp_address_province = tp_address_province
+        self.tp_address_commune = tp_address_commune
+        self.tp_address_quartier = tp_address_quartier
+        self.tp_address_avenue = tp_address_avenue
+        self.tp_address_number = tp_address_number
+        self.vat_taxpayer = vat_taxpayer
+        self.ct_taxpayer = ct_taxpayer
+        self.tl_taxpayer = tl_taxpayer
+        self.tp_fiscal_center = tp_fiscal_center
+        self.tp_activity_sector = tp_activity_sector
+        self.tp_legal_form = tp_legal_form
+        self.payment_type = payment_type
+        self.invoice_currency = invoice_currency
+        self.customer_name = customer_name
+        self.customer_TIN = customer_TIN
+        self.customer_address = customer_address
+        self.vat_customer_payer = vat_customer_payer
+        self.cancelled_invoice_ref = cancelled_invoice_ref
+        self.invoice_ref = invoice_ref
+        self.invoice_signature = invoice_signature
+        self.invoice_signature_date = invoice_signature_date
 
 # ---------------------------------------
 class Details:
-    def __init__(self):
-        self.item_designation = ""
-        self.item_quantity = ""
-        self.item_price = ""
-        self.item_ct = ""
-        self.item_tl = ""
-        self.item_price_nvat = ""
-        self.vat = ""
-        self.item_price_wvat = ""
-        self.item_total_amount = ""
+    def __init__(self,
+        item_designation,
+        item_quantity,
+        item_price,
+        item_ct,
+        item_tl,
+        item_price_nvat,
+        vat,
+        item_price_wvat,
+        item_total_amount):
+
+        self.item_designation = item_designation
+        self.item_quantity = item_quantity
+        self.item_price = item_price
+        self.item_ct = item_ct
+        self.item_tl = item_tl
+        self.item_price_nvat = item_price_nvat
+        self.vat = vat
+        self.item_price_wvat = item_price_wvat
+        self.item_total_amount = item_total_amount
 
 # ---------------------------------------
 def LoadFactureFromStringList(lst):
@@ -59,6 +100,7 @@ def LoadFactureFromStringList(lst):
     
     # 1 - Load invoice data from first list
     obj_str_facture = lst[0].facture.split(';')
+    print(obj_str_facture)
     facture = Facture(
         invoice_number = obj_str_facture[0].strip(),
         invoice_date = obj_str_facture[1].strip(),
