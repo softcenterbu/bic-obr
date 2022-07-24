@@ -118,7 +118,7 @@ def afficher_facture(request, reference):
     Lire et Afficher la facture
     """
     # Liste des details de facture
-    lst = AssFactureObr.object.filter(reference=reference)
+    lst = AssFactureObr.objects.filter(reference=reference)
 
     facture, facture_details = LoadFactureFromStringList(lst)
 
