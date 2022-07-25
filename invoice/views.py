@@ -166,7 +166,7 @@ def load_invoice(request, reference):
         try:
             invoice, invoice_items = load_invoice_json_file_by_reference(reference)
         except:
-            message = "Facture non trouvé."
+            message = "Facture non trouvé ou Format incorrect. Veuillez vérifier le format 'json' de l'OBR"
             error = True
 
     context = {
@@ -240,7 +240,7 @@ def send_invoice(request, reference):
     invoice, invoice_items = load_invoice_json_file_by_reference(reference)
 
     # Check if invoice exists
-    if check_invoice(invoice['invoice_signature']):
+    if not check_invoice(invoice['invoice_signature']):
         try:
             with open('obr_settings.json', 'r') as file:
                 settings = json.load(file)
