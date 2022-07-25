@@ -88,7 +88,7 @@ def LoadAndSaveFactureFromStringList(lst):
         invoice_items.append(item)
 
     # 2 - Load invoice data from first list
-    obj_str_invoice = lst[0].invoice.split(';') # MSSQL.table.invoice culumn
+    obj_str_invoice = lst[0].facture.split(';') # MSSQL.table.facture culumn
 
     invoice = Object()
     invoice.invoice_number = obj_str_invoice[0].strip()
