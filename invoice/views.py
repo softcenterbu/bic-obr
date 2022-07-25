@@ -123,7 +123,7 @@ def LoadAndSaveFactureFromStringList(lst):
     invoice.invoice_signature_date = obj_str_invoice[29].strip()
     invoice.invoice_items = invoice_items
 
-    # Convert invoice obect into json foramt
+    # Convert invoice obect into json format
     invoice_json = json.loads(invoice.toJSON())
 
     # Save Facture/Details to json file
@@ -156,7 +156,7 @@ def load_invoice(request, reference):
     # Liste des details de invoice
     invoice = None
     invoice_items = None
-    message = None
+    message = "Merci de lire attentivement les commentaires."
 
     try:
         lst = AssFactureObr.objects.filter(reference=reference)
