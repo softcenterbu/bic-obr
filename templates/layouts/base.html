@@ -19,7 +19,11 @@
 </head>
 <body class="bg-light">
 	
+	{% include 'layouts/navigation.html' %}
+
 	{% block content %}{% endblock %}
+
+	{% include 'layouts/footer.html' %}
 	
 	<!-- All JS project's  -->
 	<script src="/static/js/bootstrap.bundle.min.js"></script>

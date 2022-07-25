@@ -36,7 +36,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'facture',
+    'invoice',
 ]
 
 MIDDLEWARE = [
@@ -75,43 +75,43 @@ WSGI_APPLICATION = 'bic_orb.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
-
-
 DATABASES = {
     'default': {
-        # String. It must be "mssql".
-        'ENGINE': 'mssql',
-
-        # String. Database name. Required.
-        'NAME': 'QuickSoft',
-
-        # String. Database user name in "user" format. If not given then MS Integrated Security will be used.
-        'USER': 'sa',
-
-        # String. Database user password.
-        'PASSWORD': '123',
-
-         # String. SQL Server instance in "server\instance" format.
-        'HOST': '.\SQLEXPRESS2012', #.database.windows.net
-
-        # String. Server instance port. An empty string means the default port.
-        'PORT': '',
-
-        # Dictionary. Additional database settings.
-        'OPTIONS': {
-            # String. ODBC Driver to use ("ODBC Driver 17 for SQL Server", 
-            # "SQL Server Native Client 11.0", "FreeTDS" etc). 
-            # Default is "ODBC Driver 17 for SQL Server".
-            'driver': 'ODBC Driver 17 for SQL Server',
-        },
-    },
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
 }
+
+
+# DATABASES = {
+#     'default': {
+#         # String. It must be "mssql".
+#         'ENGINE': 'mssql',
+
+#         # String. Database name. Required.
+#         'NAME': 'QuickSoft',
+
+#         # String. Database user name in "user" format. If not given then MS Integrated Security will be used.
+#         'USER': 'sa',
+
+#         # String. Database user password.
+#         'PASSWORD': '123',
+
+#          # String. SQL Server instance in "server\instance" format.
+#         'HOST': '.\SQLEXPRESS2012', #.database.windows.net
+
+#         # String. Server instance port. An empty string means the default port.
+#         'PORT': '',
+
+#         # Dictionary. Additional database settings.
+#         'OPTIONS': {
+#             # String. ODBC Driver to use ("ODBC Driver 17 for SQL Server", 
+#             # "SQL Server Native Client 11.0", "FreeTDS" etc). 
+#             # Default is "ODBC Driver 17 for SQL Server".
+#             'driver': 'ODBC Driver 17 for SQL Server',
+#         },
+#     },
+# }
 
 
 # Password validation

@@ -18,6 +18,6 @@ from django.urls import path
 from  . import views
 
 urlpatterns = [
-    path('<str:reference>/', views.afficher_facture, name='afficher_facture'),
-    path('<str:reference>/envoyer', views.envoyer_facture, name='envoyer_facture'),
+    path('<str:reference>/', views.load_invoice, name='load_invoice'),
+    path('<str:reference>/envoyer', views.send_invoice, name='send_invoice'),
 ]
