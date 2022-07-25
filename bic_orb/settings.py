@@ -83,35 +83,35 @@ WSGI_APPLICATION = 'bic_orb.wsgi.application'
 # }
 
 
-DATABASES = {
-    'default': {
-        # String. It must be "mssql".
-        'ENGINE': 'mssql',
+# DATABASES = {
+#     'default': {
+#         # String. It must be "mssql".
+#         'ENGINE': 'mssql',
 
-        # String. Database name. Required.
-        'NAME': 'QuickSoft',
+#         # String. Database name. Required.
+#         'NAME': 'QuickSoft',
 
-        # String. Database user name in "user" format. If not given then MS Integrated Security will be used.
-        'USER': 'sa',
+#         # String. Database user name in "user" format. If not given then MS Integrated Security will be used.
+#         'USER': 'sa',
 
-        # String. Database user password.
-        'PASSWORD': '123',
+#         # String. Database user password.
+#         'PASSWORD': '123',
 
-         # String. SQL Server instance in "server\instance" format.
-        'HOST': '.\SQLEXPRESS2012', #.database.windows.net
+#          # String. SQL Server instance in "server\instance" format.
+#         'HOST': '.\SQLEXPRESS2012', #.database.windows.net
 
-        # String. Server instance port. An empty string means the default port.
-        'PORT': '',
+#         # String. Server instance port. An empty string means the default port.
+#         'PORT': '',
 
-        # Dictionary. Additional database settings.
-        'OPTIONS': {
-            # String. ODBC Driver to use ("ODBC Driver 17 for SQL Server", 
-            # "SQL Server Native Client 11.0", "FreeTDS" etc). 
-            # Default is "ODBC Driver 17 for SQL Server".
-            'driver': 'ODBC Driver 17 for SQL Server',
-        },
-    },
-}
+#         # Dictionary. Additional database settings.
+#         'OPTIONS': {
+#             # String. ODBC Driver to use ("ODBC Driver 17 for SQL Server", 
+#             # "SQL Server Native Client 11.0", "FreeTDS" etc). 
+#             # Default is "ODBC Driver 17 for SQL Server".
+#             'driver': 'ODBC Driver 17 for SQL Server',
+#         },
+#     },
+# }
 
 
 # Password validation

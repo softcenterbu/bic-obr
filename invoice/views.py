@@ -156,6 +156,7 @@ def load_invoice(request, reference):
     # Liste des details de invoice
     invoice = None
     invoice_items = None
+    error = False
     message = "Merci de lire attentivement les commentaires."
 
     try:
@@ -166,13 +167,15 @@ def load_invoice(request, reference):
             invoice, invoice_items = load_invoice_json_file_by_reference(reference)
         except:
             message = "Facture non trouvé."
+            error = True
 
     context = {
 		'reference': reference,
         'invoice': invoice,
         'invoice_items': invoice_items,
         'sent': False,
-        'message': message
+        'message': message,
+        'error': error
 	}
 
     html_template = loader.get_template('invoice.html')
