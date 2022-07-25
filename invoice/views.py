@@ -1,3 +1,5 @@
+from distutils.log import warn
+from logging import warning
 from django.http import HttpResponse
 from django.template import loader
 from .models import AssFactureObr
@@ -177,48 +179,100 @@ def load_invoice(request, reference):
     return HttpResponse(html_template.render(context, request))
 
 # ---------------------------------------
+def check_invoice(invoice_signature):
+    """
+    Check if invoice exists
+    Protocol http de la méthode: POST
+    URL: http://41.79.226.28:8345/ebms_api/getInvoice/
+    En-tête
+    Authorization:Bearer xxx
+    Corps de la requête
+    {
+        "invoice_signature":"xxx"
+    }
+    Champs obligatoires
+    invoice_signature
+    """
+    auth = None
+
+    try:
+        # Load json settings  
+        with open('obr_settings.json', 'r') as file:
+            settings = json.load(file)
+            if settings:
+                auth = AuthenticationEBMS(settings['username'], settings['password'], settings['url_api_login'])
+
+        # Connect to endpoint 
+        auth.connect()
+
+        # Send invoice (add invoice)
+        url = settings['url_api_get_invoice']
+        headers = CaseInsensitiveDict()
+        headers["Accept"] = "application/json"
+        headers["Authorization"] = "Bearer {}".format(auth.token)
+        response = requests.post(
+            url, 
+            data=json.dumps(
+                {"invoice_signature": invoice_signature}
+            ),
+            headers=headers
+        )
+        if (response.status_code == 200):
+            return True
+    except:
+        pass
+    
+    return False
+
+# ---------------------------------------
 def send_invoice(request, reference):
     """
     Send invoice via API
     """
     auth = None
     success = False
+    warning = False
 
     # Load invoice json file
     invoice, invoice_items = load_invoice_json_file_by_reference(reference)
-    
-    try:
-        with open('obr_settings.json', 'r') as file:
-            settings = json.load(file)
-            if settings:
-                auth = AuthenticationEBMS(settings['username'], settings['password'], settings['url_api_login'])
-    
-        # Connect to endpoint 
-        auth.connect()
 
-        # Load json invoice in '/temps'
-        with open('{}{}.json'.format(settings['invoice_directory'], reference), 'r') as json_file_invoice:
-            invoice_to_send = json.load(json_file_invoice)
-        
-        # Send invoice (add invoice)
-        url = settings['url_api_add_invoice']
-        headers = CaseInsensitiveDict()
-        headers["Accept"] = "application/json"
-        headers["Authorization"] = "Bearer {}".format(auth.token)
-        response = requests.post(
-            url, 
-            data=json.dumps(invoice_to_send),
-            headers=headers
-        )
-        message = json.loads(response.text)['msg']
-        
-        if (response.status_code == 200):
-            success = True
-    except Exception as e:
+    # Check if invoice exists
+    if check_invoice(invoice['invoice_signature']):
         try:
-            message = str(e.args[0].reason).split(">:")[1]
-        except:
-            message = str(e)
+            with open('obr_settings.json', 'r') as file:
+                settings = json.load(file)
+                if settings:
+                    auth = AuthenticationEBMS(settings['username'], settings['password'], settings['url_api_login'])
+        
+            # Connect to endpoint 
+            auth.connect()
+
+            # Load json invoice in '/temps'
+            with open('{}{}.json'.format(settings['invoice_directory'], reference), 'r') as json_file_invoice:
+                invoice_to_send = json.load(json_file_invoice)
+            
+            # Send invoice (add invoice)
+            url = settings['url_api_add_invoice']
+            headers = CaseInsensitiveDict()
+            headers["Accept"] = "application/json"
+            headers["Authorization"] = "Bearer {}".format(auth.token)
+            response = requests.post(
+                url, 
+                data=json.dumps(invoice_to_send),
+                headers=headers
+            )
+            message = json.loads(response.text)['msg']
+            
+            if (response.status_code == 200):
+                success = True
+        except Exception as e:
+            try:
+                message = str(e.args[0].reason).split(">:")[1]
+            except:
+                message = str(e)
+    else:
+        message = "Cette facture a été déjà envoyée à l'OBR"
+        warning = True
 
     context = {
 		'reference': reference,
@@ -226,7 +280,8 @@ def send_invoice(request, reference):
         'invoice_items': invoice_items,
         'success': success,
         'message': message,
-        'sent': True
+        'sent': True,
+        'warning': warning
 	}
 
     html_template = loader.get_template('invoice.html')
