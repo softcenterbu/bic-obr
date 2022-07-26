@@ -79,44 +79,29 @@
         {% if sent %}
             {% if success %}
                 <!-- Success Alert -->
-                <div class="alert alert-success d-flex align-items-center" role="alert">
-                    <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Success:"><use xlink:href="#check-circle-fill"></use></svg>
-                    <div>
-                        {{ message }}
-                    </div>
+                <div class="alert alert-warning" role="alert">
+                    {{ message }}
                 </div>
             {% elif warning %}
                 <!-- Warning Alert -->
-                <div class="alert alert-warning d-flex align-items-center" role="alert">
-                    <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Warning:"><use xlink:href="#exclamation-triangle-fill"></use></svg>
-                    <div>
-                        {{ message }}
-                    </div>
-                  </div>
+                <div class="alert alert-warning" role="alert">
+                    {{ message }}
+                </div>
             {% else %}
                 <!-- Error Alert -->
-                <div class="alert alert-danger d-flex align-items-center" role="alert">
-                    <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Danger:"><use xlink:href="#exclamation-triangle-fill"/></svg>
-                    <div>
-                        {{ message }}
-                    </div>
+                <div class="alert alert-danger" role="alert">
+                    {{ message }}
                 </div>
             {% endif %}
         {% elif error %}
             <!-- Error Alert -->
-            <div class="alert alert-danger d-flex align-items-center" role="alert">
-                <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Danger:"><use xlink:href="#exclamation-triangle-fill"/></svg>
-                <div>
-                    {{ message }}
-                </div>
+            <div class="alert alert-danger" role="alert">
+                {{ message }}
             </div>
         {% else %}
             <!-- Info Alert -->
-            <div class="alert alert-primary d-flex align-items-center" role="alert">
-                <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Info:"><use xlink:href="#info-fill"></use></svg>
-                <div>
-                    {{ message }}
-                </div>
+            <div class="alert alert-primary" role="alert">
+                {{ message }}
             </div>
         {% endif %}
     </div>
