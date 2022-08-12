@@ -1,5 +1,5 @@
 """
-ASGI config for quicksoft_orb project.
+ASGI config for quicksoft-obr project.
 
 It exposes the ASGI callable as a module-level variable named ``application``.
 

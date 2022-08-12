@@ -1,5 +1,5 @@
 """
-WSGI config for quicksoft_orb project.
+WSGI config for quicksoft-obr project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
