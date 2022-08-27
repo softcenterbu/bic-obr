@@ -10,7 +10,7 @@ class AssFactureObr(models.Model):
     
     class Meta:
         managed = False
-        db_table = 'AssFactureObr'
+        db_table = 'FactureObr'
 
     def __str__(self):
         return self.reference
