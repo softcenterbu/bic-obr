@@ -67,9 +67,10 @@
             </ul>
             <div class="card-body">
                 <!-- Button trigger modal -->
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#confirmModal">
+                <!-- <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#confirmModal">
                     Envoyer la facture
-                </button>
+                </button> -->
+                <a href="{% url 'send_invoice' reference %}" class="btn btn-danger">Confirmer</a>
             </div>
             <div class="card-footer">
                 <small class="text-muted">Seule la facature validée peut être envoyée à l'OBR.</small>

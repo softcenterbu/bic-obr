@@ -118,9 +118,10 @@ def LoadAndSaveFactureFromStringList(lst):
     invoice.customer_address = obj_str_invoice[24].strip()
     invoice.vat_customer_payer = obj_str_invoice[25].strip()
     invoice.cancelled_invoice_ref = obj_str_invoice[26].strip()
-    invoice.invoice_ref = obj_str_invoice[27].strip()
-    invoice.invoice_signature = obj_str_invoice[28].strip()
-    invoice.invoice_signature_date = obj_str_invoice[29].strip()
+    invoice.cancelled_invoice = obj_str_invoice[27].strip()
+    invoice.invoice_ref = obj_str_invoice[28].strip()
+    invoice.invoice_signature = obj_str_invoice[29].strip()
+    invoice.invoice_signature_date = obj_str_invoice[30].strip()
     invoice.invoice_items = invoice_items
 
     # Convert invoice obect into json format
