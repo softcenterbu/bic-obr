@@ -1,5 +1,3 @@
-from distutils.log import warn
-from logging import warning
 from django.http import HttpResponse
 from django.template import loader
 from .models import AssFactureObr
@@ -128,7 +126,7 @@ def LoadAndSaveFactureFromStringList(lst):
     invoice_json = json.loads(invoice.toJSON())
 
     # Save Facture/Details to json file
-    with open('obr_settings.json', 'r') as file:
+    with open('settings.json', 'r') as file:
         settings = json.load(file)
         jsonFile = open('{}{}.json'.format(settings['invoice_directory'], invoice.invoice_number), "w")
         jsonFile.write(json.dumps(invoice_json))
@@ -142,7 +140,7 @@ def load_invoice_json_file_by_reference(reference):
     Load invoice from json file by reference (referece is the name of object)
     """
     invoice = None
-    with open('obr_settings.json', 'r') as file:
+    with open('setting.json', 'r') as file:
         settings = json.load(file)
         with open('{}{}.json'.format(settings['invoice_directory'], reference), 'r') as file:
             invoice = json.load(file)
@@ -201,7 +199,7 @@ def check_invoice(invoice_signature):
 
     try:
         # Load json settings  
-        with open('obr_settings.json', 'r') as file:
+        with open('setting.json', 'r') as file:
             settings = json.load(file)
             if settings:
                 auth = AuthenticationEBMS(settings['username'], settings['password'], settings['url_api_login'])
@@ -243,7 +241,7 @@ def send_invoice(request, reference):
     # Check if invoice exists
     if not check_invoice(invoice['invoice_signature']):
         try:
-            with open('obr_settings.json', 'r') as file:
+            with open('setting.json', 'r') as file:
                 settings = json.load(file)
                 if settings:
                     auth = AuthenticationEBMS(settings['username'], settings['password'], settings['url_api_login'])

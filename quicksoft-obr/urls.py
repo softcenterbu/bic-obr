@@ -1,4 +1,4 @@
-"""bic_orb URL Configuration
+"""quicksoft-obr URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/4.0/topics/http/urls/
@@ -20,4 +20,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     
     path('invoices/', include("invoice.urls")),
+    path('assurances/', include("assurance.urls")),
 ]
