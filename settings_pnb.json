@@ -1,8 +1,0 @@
-{
-    "username": "john@assurance.bi",
-	"password": "12345678",
-    "url_api_login": "http://app.mediabox.bi:2522/users/login",	
-    "url_api_add_assurance": "http://app.mediabox.bi:2522/psr/assurances",
-    "url_api_get_assurance":"http://app.mediabox.bi:2522/psr/assurances?numero_assurance=",
-    "assurance_directory": "temps/"
-}
