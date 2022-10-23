@@ -1,6 +1,5 @@
-from django.http import HttpResponse
-from django.template import loader
-from .models import AssFactureObr
+from django.http import HttpResponseRedirect
+from .models import Invoice
 import json
 import requests
 from requests.structures import CaseInsensitiveDict
@@ -8,7 +7,7 @@ from requests.structures import CaseInsensitiveDict
 # ---------------------------------------
 class Object:
     """
-    Dynamic object for (Facture and Items)
+    Dynamic object for (Invoice and Items)
     """
     def toJSON(self):
         return json.dumps(self, default=lambda o: o.__dict__, 
@@ -58,7 +57,7 @@ class AuthenticationEBMS:
         return self._connected
 
 # ---------------------------------------
-def LoadAndSaveFactureFromStringList(lst):
+def LoadAndSaveInvoiceFromStringList(lst):
     """
     Load invoice and details from string list (MSSQL)
     """
@@ -125,7 +124,7 @@ def LoadAndSaveFactureFromStringList(lst):
     # Convert invoice obect into json format
     invoice_json = json.loads(invoice.toJSON())
 
-    # Save Facture/Details to json file
+    # Save Invoices/Details to json file
     with open('settings.json', 'r') as file:
         settings = json.load(file)
         jsonFile = open('{}{}.json'.format(settings['invoice_directory'], invoice.invoice_number), "w")
@@ -140,7 +139,7 @@ def load_invoice_json_file_by_reference(reference):
     Load invoice from json file by reference (referece is the name of object)
     """
     invoice = None
-    with open('setting.json', 'r') as file:
+    with open('settings.json', 'r') as file:
         settings = json.load(file)
         with open('{}{}.json'.format(settings['invoice_directory'], reference), 'r') as file:
             invoice = json.load(file)
@@ -148,40 +147,7 @@ def load_invoice_json_file_by_reference(reference):
     return invoice, invoice['invoice_items']
 
 # ---------------------------------------
-def load_invoice(request, reference):
-    """
-    Lire et Afficher la invoice
-    """
-    # Liste des details de invoice
-    invoice = None
-    invoice_items = None
-    error = False
-    message = "Merci de lire attentivement les commentaires."
-
-    try:
-        lst = AssFactureObr.objects.filter(reference=reference)
-        invoice, invoice_items = LoadAndSaveFactureFromStringList(lst)
-    except:
-        try:
-            invoice, invoice_items = load_invoice_json_file_by_reference(reference)
-        except:
-            message = "Facture non trouvé ou Format incorrect. Veuillez vérifier le format 'json' de l'OBR"
-            error = True
-
-    context = {
-		'reference': reference,
-        'invoice': invoice,
-        'invoice_items': invoice_items,
-        'sent': False,
-        'message': message,
-        'error': error
-	}
-
-    html_template = loader.get_template('invoice.html')
-    return HttpResponse(html_template.render(context, request))
-
-# ---------------------------------------
-def check_invoice(invoice_signature):
+def check_invoice(invoice_signature, token=None):
     """
     Check if invoice exists
     Protocol http de la méthode: POST
@@ -195,31 +161,35 @@ def check_invoice(invoice_signature):
     Champs obligatoires
     invoice_signature
     """
-    auth = None
-
+    # Send invoice (add invoice)
+    
+    headers = CaseInsensitiveDict()
+    headers["Accept"] = "application/json"
+    url = None
     try:
-        # Load json settings  
-        with open('setting.json', 'r') as file:
-            settings = json.load(file)
-            if settings:
-                auth = AuthenticationEBMS(settings['username'], settings['password'], settings['url_api_login'])
-
-        # Connect to endpoint 
-        auth.connect()
-
-        # Send invoice (add invoice)
-        url = settings['url_api_get_invoice']
-        headers = CaseInsensitiveDict()
-        headers["Accept"] = "application/json"
-        headers["Authorization"] = "Bearer {}".format(auth.token)
+        if token:
+            headers["Authorization"] = "Bearer {}".format(token)
+        else:
+            auth = None
+            # Load json settings  
+            with open('settings.json', 'r') as file:
+                settings = json.load(file)
+                if settings:
+                    auth = AuthenticationEBMS(settings['username'], settings['password'], settings['url_api_login'])
+                    auth.connect() # Connect to endpoint 
+                    headers["Authorization"] = "Bearer {}".format(auth.token)
+                    url = settings['url_api_get_invoice']
+    
         response = requests.post(
             url, 
             data=json.dumps(
-                {"invoice_signature": invoice_signature}
+                { 
+                    "invoice_signature": invoice_signature
+                }
             ),
             headers=headers
         )
-        if (response.status_code == 200):
+        if (response.status_code in [200, 201, 202]):
             return True
     except:
         pass
@@ -231,24 +201,34 @@ def send_invoice(request, reference):
     """
     Send invoice via API
     """
-    auth = None
-    success = False
-    warning = False
+    url_next = request.GET['url_next']
+    url_next +="&paramId=" + request.GET['paramId']
+    # print("URL_NEXT: {}".format(url_next))
 
-    # Load invoice json file
-    invoice, invoice_items = load_invoice_json_file_by_reference(reference)
+    auth = None
+    invoice = None
+    invoice_items = None
+
+    try:
+        lst = Invoice.objects.filter(reference=reference)
+        invoice, invoice_items = LoadAndSaveInvoiceFromStringList(lst)
+    except:
+        try:
+            invoice, invoice_items = load_invoice_json_file_by_reference(reference)
+        except:
+            pass
+
+    with open('settings.json', 'r') as file:
+        settings = json.load(file)
+        if settings:
+            auth = AuthenticationEBMS(settings['username'], settings['password'], settings['url_api_login'])
+            auth.connect() # Connect to endpoint 
 
     # Check if invoice exists
-    if not check_invoice(invoice['invoice_signature']):
-        try:
-            with open('setting.json', 'r') as file:
-                settings = json.load(file)
-                if settings:
-                    auth = AuthenticationEBMS(settings['username'], settings['password'], settings['url_api_login'])
-        
-            # Connect to endpoint 
-            auth.connect()
+    checked = check_invoice(invoice.invoice_signature, auth.token)
 
+    if auth and (checked==False) and invoice and invoice_items:
+        try:
             # Load json invoice in '/temps'
             with open('{}{}.json'.format(settings['invoice_directory'], reference), 'r') as json_file_invoice:
                 invoice_to_send = json.load(json_file_invoice)
@@ -263,28 +243,96 @@ def send_invoice(request, reference):
                 data=json.dumps(invoice_to_send),
                 headers=headers
             )
-            message = json.loads(response.text)['msg']
-            
-            if (response.status_code == 200):
-                success = True
+            if (response.status_code in [200, 201, 202]):
+                # Mettre à jour la colonne envoyee de la table 'Invoice'
+                obj = Invoice.objects.filter(reference=reference).first()
+                if obj:
+                    obj.envoyee = True
+                    obj.save()
+                
+                print("====> Facture Réf° {} envoyée avec succès à l'OBR".format(reference))
+            else:
+                try:
+                    msg = json.loads(response.text)
+                    msg = ", message: " + msg['msg']
+                except:
+                    try:
+                        msg = json.loads(response.content)
+                        msg = ", message: " + msg['msg']
+                    except Exception as e:
+                        msg = ", message: " + str(e)
+
+                print("====> ERREUR, d'envoi de la facture Réf {} à l'OBR {}".format(reference, msg))
+
         except Exception as e:
-            try:
-                message = str(e.args[0].reason).split(">:")[1]
-            except:
-                message = str(e)
+            print("====> ERREUR d'envoi de la facture Réf {} à l'OBR, message: {}".format(reference, str(e)))
+    
+    elif checked:
+        print("====> ERREUR, la facture Réf {} est déjà enregstrée à l'OBR".format(reference))
+    elif invoice is None or invoice_items is None:
+        print("====> ERREUR, Erreur de création du fichier Json facture ou donnée incorrect générée par QuickSoft, Réf {}".format(reference))
+    elif not auth or not auth.token:
+        print("====> ERREUR d'authentification à l'API de l'OBR")
     else:
-        message = "Cette facture a été déjà envoyée à l'OBR"
-        warning = True
+        print("====> ERREUR innattendue pour l'envoi de la facture, facture Réf {}, veuillez contacter votre fournisseur de logiciel".format(reference))
 
-    context = {
-		'reference': reference,
-        'invoice': invoice,
-        'invoice_items': invoice_items,
-        'success': success,
-        'message': message,
-        'sent': True,
-        'warning': warning
-	}
+    return HttpResponseRedirect(url_next)
 
-    html_template = loader.get_template('invoice.html')
-    return HttpResponse(html_template.render(context, request))
+# ---------------------------------------
+def cancel_invoice(request, reference):
+    """
+    Canbcel invoice via API
+    body: {
+        "invoice_signature":"4701354861/ws470135486100027/20220211120214/01929"
+    }
+    """
+    url_next = request.GET['url_next']
+    url_next +="&paramId=" + request.GET['paramId']
+    #print("URL_NEXT: {}".format(url_next))
+
+    try:
+        # Load invoice json file
+        invoice, invoice_items = load_invoice_json_file_by_reference(reference)
+
+        with open('settings.json', 'r') as file:
+            settings = json.load(file)
+            if settings:
+                auth = AuthenticationEBMS(settings['username'], settings['password'], settings['url_api_login'])
+    
+        # Connect to endpoint 
+        auth.connect()
+        
+        # Cancel invoice
+        url = settings['url_api_cancel_invoice']
+        headers = CaseInsensitiveDict()
+        headers["Accept"] = "application/json"
+        headers["Authorization"] = "Bearer {}".format(auth.token)
+        response = requests.post(
+            url, 
+            data=json.dumps({"invoice_signature": invoice['invoice_signature']}),
+            headers=headers
+        )
+        if (response.status_code in [200, 201, 202]):
+            # Mettre à jour la colonne envoyee de la table 'Invoice'
+            obj = Invoice.objects.filter(reference=reference).first()
+            obj.annulee = True
+            obj.save()
+
+            print("====> Facture Réf° {} annulée avec succès à l'OBR".format(reference))
+        else:
+            try:
+                msg = json.loads(response.text)
+                msg = ", message: " + msg['msg']
+            except:
+                try:
+                    msg = json.loads(response.content)
+                    msg = ", message: " + msg['msg']
+                except Exception as e:
+                    msg = ", message: " + str(e)
+    
+            print("====> ERREUR d'annulation de la facture Réf {} à l'OBR {}".format(reference, msg))
+            
+    except Exception as e:
+        print("====> ERREUR d'annulation de la facture Réf {} à l'OBR, message: ".format(reference, str(e)))
+
+    return HttpResponseRedirect(url_next)

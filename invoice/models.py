@@ -1,16 +1,18 @@
 from django.db import models
 
-class AssFactureObr(models.Model):
+class Invoice(models.Model):
     """
-    Modele Facture Assurance Facture Obr
+    Modele Facture Obr (QuikSoft)
     """
     reference = models.CharField(db_column='Reference', max_length=100, db_collation='French_CI_AS', blank=True, null=True)
     facture = models.CharField(db_column='Facture', max_length=1024, db_collation='French_CI_AS', blank=True, null=True)
     details = models.CharField(db_column='Details', max_length=1024, db_collation='French_CI_AS', blank=True, null=True)
-    
+    envoyee = models.BooleanField(db_column='Envoyee', default=False)
+    annulee = models.BooleanField(db_column='Annulee', default=False)
+
     class Meta:
         managed = False
-        db_table = 'FactureObr'
+        db_table = 'AssFactureObr'
 
     def __str__(self):
         return self.reference
