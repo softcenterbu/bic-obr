@@ -216,6 +216,7 @@ def send_invoice(request, reference):
         try:
             invoice, invoice_items = load_invoice_json_file_by_reference(reference)
         except:
+            print("Error, fichier json not created")
             pass
 
     with open('settings.json', 'r') as file:
