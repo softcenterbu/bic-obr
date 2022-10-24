@@ -1,6 +1,6 @@
 {
-    "username": "",
-	"password": "",
+    "username": "ws400000161200202",
+	"password": "d?d4hieF",
     "url_api_login": "http://41.79.226.28:8345/ebms_api/login/",	
     "url_api_get_invoice": "http://41.79.226.28:8345/ebms_api/getInvoice/",
     "url_api_add_invoice":"http://41.79.226.28:8345/ebms_api/addInvoice/",
