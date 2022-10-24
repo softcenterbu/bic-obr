@@ -92,7 +92,7 @@ DATABASES = {
         'NAME': 'QuickSoft',
 
         # String. Database user name in "user" format. If not given then MS Integrated Security will be used.
-        'USER': 'sa',
+        'USER': 'quicksoft',
 
         # String. Database user password.
         'PASSWORD': 'aze/*-123', # 123
