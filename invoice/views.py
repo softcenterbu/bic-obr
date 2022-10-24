@@ -202,7 +202,7 @@ def send_invoice(request, reference):
     Send invoice via API
     """
     url_next = request.GET['url_next']
-    url_next +="&paramId=" + request.GET['paramId']
+    #url_next +="&paramId=" + request.GET['paramId']
     # print("URL_NEXT: {}".format(url_next))
 
     auth = None
@@ -287,7 +287,7 @@ def cancel_invoice(request, reference):
     }
     """
     url_next = request.GET['url_next']
-    url_next +="&paramId=" + request.GET['paramId']
+    #url_next +="&paramId=" + request.GET['paramId']
     #print("URL_NEXT: {}".format(url_next))
 
     try:
