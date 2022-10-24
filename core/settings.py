@@ -95,10 +95,10 @@ DATABASES = {
         'USER': 'sa',
 
         # String. Database user password.
-        'PASSWORD': '123',
+        'PASSWORD': 'aze/*-123', # 123
 
          # String. SQL Server instance in "server\instance" format.
-        'HOST': '.\SQLEXPRESS2012', # '192.168.88.111, 1433',
+        'HOST': '192.168.88.26, 1433', # .\SQLEXPRESS2012 '',
 
         # String. Server instance port. An empty string means the default port.
         'PORT': '',
