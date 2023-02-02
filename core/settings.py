@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-ok+4c^uw7m$9q^%)u5*oeoyzq9w30us+q1nyvqby_do$mn2z$u
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['192.168.88.250',]
+ALLOWED_HOSTS = ['*',]
 
 # Application definition
 
@@ -36,7 +36,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'invoice'
+    'invoice',
+    
 ]
 
 MIDDLEWARE = [
@@ -98,7 +99,7 @@ DATABASES = {
         'PASSWORD': 'aze/*-123', # 123
 
          # String. SQL Server instance in "server\instance" format.
-        'HOST': '192.168.88.26, 1433', # .\SQLEXPRESS2012 '',
+        'HOST': '192.168.88.128, 1433', # .\SQLEXPRESS2012 '',
 
         # String. Server instance port. An empty string means the default port.
         'PORT': '',

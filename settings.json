@@ -1,10 +1,10 @@
 {
-    "username": "ws400000161200202",
-	"password": "d?d4hieF",
-    "url_api_login": "http://41.79.226.28:8345/ebms_api/login/",	
-    "url_api_get_invoice": "http://41.79.226.28:8345/ebms_api/getInvoice/",
-    "url_api_add_invoice":"http://41.79.226.28:8345/ebms_api/addInvoice/",
-    "url_api_verify_nif": "http://41.79.226.28:8345/ebms_api/checkTIN/",
-    "url_api_cancel_invoice": "http://41.79.226.28:8345/ebms_api/cancelInvoice/",
+    "username": "ws400029527100368",
+        "password": "r7Z,o<(q",
+    "url_api_login": "https://ebms.obr.gov.bi:9443/ebms_api/login/",
+    "url_api_get_invoice": "https://ebms.obr.gov.bi:9443/ebms_api/getInvoice/",
+    "url_api_add_invoice":"https://ebms.obr.gov.bi:9443/ebms_api/addInvoice/",
+    "url_api_verify_nif": "https://ebms.obr.gov.bi:9443/ebms_api/checkTIN/",
+    "url_api_cancel_invoice": "https://ebms.obr.gov.bi:9443/ebms_api/cancelInvoice/",
     "invoice_directory": "temps/"
 }

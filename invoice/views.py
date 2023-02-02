@@ -196,6 +196,137 @@ def check_invoice(invoice_signature, token=None):
     
     return False
 
+
+# ---------------------------------------
+def send_invoice_offline():
+    """
+    Send invoice via API
+    """
+    # url_next = request.GET['url_next']
+    #url_next +="&paramId=" + request.GET['paramId']
+    # print("URL_NEXT: {}".format(url_next))
+
+    auth = None
+    invoice = None
+    invoice_items = None
+    
+    x = Invoice.objects.filter(Q(envoyee='False'), Q(envoyee__is__null=True))
+    for invoice_notsend in x:
+        
+        try:
+            lst = Invoice.objects.filter(reference=invoice_notsend.reference)
+            invoice, invoice_items = LoadAndSaveInvoiceFromStringList(lst)
+            # invoice, invoice_items = LoadAndSaveInvoiceFromStringList(invoice_notsend)
+        except:
+            try:
+                invoice, invoice_items = load_invoice_json_file_by_reference(invoice_notsend)
+            except:
+                print("Error, fichier json not created")
+                pass
+
+        try:
+            with open('settings.json', 'r') as file:
+                settings = json.load(file)
+                if settings:
+                    auth = AuthenticationEBMS(settings['username'], settings['password'], settings['url_api_login'])
+                    auth.connect() # Connect to endpoint 
+        except:
+            # Mettre à jour la colonne envoyee de la table 'Invoice'
+            obj = Invoice.objects.filter(reference=invoice_notsend.reference).first()
+            if obj:
+                obj.envoyee = False
+                obj.save()
+    
+        # Check if invoice exists
+        checked = check_invoice(invoice.invoice_signature, auth.token)
+
+        if auth and (checked==False) and invoice and invoice_items:
+            try:
+                # Load json invoice in '/temps'
+                with open('{}{}.json'.format(settings['invoice_directory'], invoice_notsend), 'r') as json_file_invoice:
+                    invoice_to_send = json.load(json_file_invoice)
+                
+                # Send invoice (add invoice)
+                url = settings['url_api_add_invoice']
+                headers = CaseInsensitiveDict()
+                headers["Accept"] = "application/json"
+                headers["Authorization"] = "Bearer {}".format(auth.token)
+                response = requests.post(
+                    url, 
+                    data=json.dumps(invoice_to_send),
+                    headers=headers
+                )
+                if (response.status_code in [200, 201, 202]):
+                    # Mettre à jour la colonne envoyee de la table 'Invoice'
+                    obj = Invoice.objects.filter(reference=invoice_notsend.reference).first()
+                    if obj:
+                        obj.envoyee = True
+                        obj.save()
+                    print("====> Facture Réf° {} envoyée avec succès à l'OBR".format(invoice_notsend))
+                else:
+                    # Mettre à jour la colonne envoyee de la table 'Invoice'
+                    obj = Invoice.objects.filter(reference=invoice_notsend.reference).first()
+                    if obj:
+                        obj.envoyee = False
+                        obj.save()
+                
+                    try:
+                        msg = json.loads(response.text)
+                        msg = ", message: " + msg['msg']
+                    except:
+                        try:
+                            msg = json.loads(response.content)
+                            msg = ", message: " + msg['msg']
+                        except Exception as e:
+                            msg = ", message: " + str(e)
+
+                    print("====> ERREUR, d'envoi de la facture Réf {} à l'OBR {}".format(invoice_notsend, msg))
+
+            except Exception as e:
+                # Mettre à jour la colonne envoyee de la table 'Invoice'
+                obj = Invoice.objects.filter(reference=invoice_notsend.reference).first()
+                if obj:
+                    obj.envoyee = False
+                    obj.save()
+        
+                print("====> ERREUR d'envoi de la facture Réf {} à l'OBR, message: {}".format(invoice_notsend, str(e)))
+        
+        elif checked:
+            # Mettre à jour la colonne envoyee de la table 'Invoice'
+            obj = Invoice.objects.filter(reference=invoice_notsend.reference).first()
+            if obj:
+                obj.envoyee = False
+                obj.save()
+        
+            print("====> ERREUR, la facture Réf {} est déjà enregstrée à l'OBR".format(invoice_notsend))
+        elif invoice is None or invoice_items is None:
+            # Mettre à jour la colonne envoyee de la table 'Invoice'
+            obj = Invoice.objects.filter(reference=invoice_notsend.reference).first()
+            if obj:
+                obj.envoyee = False
+                obj.save()
+        
+            print("====> ERREUR, Erreur de création du fichier Json facture ou donnée incorrect générée par QuickSoft, Réf {}".format(reference))
+        elif not auth or not auth.token:
+            # Mettre à jour la colonne envoyee de la table 'Invoice'
+            obj = Invoice.objects.filter(reference=invoice_notsend.reference).first()
+            if obj:
+                obj.envoyee = False
+                obj.save()
+        
+            print("====> ERREUR d'authentification à l'API de l'OBR")
+        else:
+            # Mettre à jour la colonne envoyee de la table 'Invoice'
+            obj = Invoice.objects.filter(reference=invoice_notsend.reference).first()
+            if obj:
+                obj.envoyee = False
+                obj.save()
+        
+            print("====> ERREUR innattendue pour l'envoi de la facture, facture Réf {}, veuillez contacter votre fournisseur de logiciel".format(reference))
+
+        return True
+
+
 # ---------------------------------------
 def send_invoice(request, reference):
     """
