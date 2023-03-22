@@ -3,6 +3,7 @@ from .models import Invoice
 import json
 import requests
 from requests.structures import CaseInsensitiveDict
+from django.db.models import Q
 
 # ---------------------------------------
 class Object:
